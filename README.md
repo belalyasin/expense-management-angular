@@ -1,27 +1,25 @@
-# ExpenseManagement
+# Expense Management: Angular Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.11.
+Angular client for the [Expense Management API](https://github.com/belalyasin/expense-management-api).
 
-## Development server
+## Status
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Early work in progress.
 
-## Code scaffolding
+- Done: project setup, AdminLTE dashboard layout (header, sidebar, footer), login and registration page markup
+- Next: routing, authentication against the API, expense list and entry form, monthly statistics, categories
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Tech stack
 
-## Build
+Angular 15, TypeScript, AdminLTE 4, Sass
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Getting started
 
-## Running unit tests
+```bash
+git clone https://github.com/belalyasin/expense-management-angular.git
+cd expense-management-angular
+npm install
+npm start
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Then open http://localhost:4200.
