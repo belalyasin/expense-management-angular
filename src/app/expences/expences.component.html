@@ -1,1 +1,170 @@
-<p>expences works!</p>
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2 align-items-center">
+      <div class="col-sm-5">
+        <h1 class="m-0">Expenses</h1>
+      </div>
+      <div class="col-sm-4 mt-2 mt-sm-0">
+        <app-month-picker></app-month-picker>
+      </div>
+      <div class="col-sm-3 mt-2 mt-sm-0 text-sm-right">
+        <button type="button" class="btn btn-primary btn-block" (click)="startAdd()" *ngIf="!formOpen">
+          <i class="fas fa-plus mr-1"></i>Add expense
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="alert alert-danger" role="alert" *ngIf="error">{{ error }}</div>
+
+    <div class="card card-primary" *ngIf="formOpen">
+      <div class="card-header">
+        <h3 class="card-title">{{ editing ? 'Edit expense' : 'New expense' }}</h3>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="card-body">
+          <div class="callout callout-warning" *ngIf="categoriesLoaded && categories.length === 0">
+            <p class="mb-0">
+              An expense needs a category. <a routerLink="/categories">Create a category first.</a>
+            </p>
+          </div>
+          <div class="alert alert-danger" role="alert" *ngIf="formError">{{ formError }}</div>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label for="expense-amount">Amount</label>
+              <input
+                id="expense-amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputmode="decimal"
+                class="form-control"
+                formControlName="amount"
+                [class.is-invalid]="showError('amount')"
+              />
+              <span class="invalid-feedback">Enter an amount above zero.</span>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="expense-category">Category</label>
+              <select
+                id="expense-category"
+                class="form-control"
+                formControlName="category"
+                [class.is-invalid]="showError('category')"
+              >
+                <option value="" disabled>Choose…</option>
+                <option *ngFor="let category of categories" [value]="category.name">{{ category.name }}</option>
+              </select>
+              <span class="invalid-feedback">Choose a category.</span>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="expense-date">Date</label>
+              <input
+                id="expense-date"
+                type="date"
+                class="form-control"
+                formControlName="date"
+                [class.is-invalid]="showError('date')"
+              />
+              <span class="invalid-feedback">Choose a date.</span>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="expense-description">Description <small class="text-muted">(optional)</small></label>
+              <input id="expense-description" type="text" class="form-control" formControlName="description" />
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save' }}
+          </button>
+          <button type="button" class="btn btn-default ml-2" (click)="closeForm()" [disabled]="saving">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <p class="text-muted p-3 mb-0" *ngIf="loading && expenses.length === 0">Loading…</p>
+        <p class="text-muted p-3 mb-0" *ngIf="!loading && !error && expenses.length === 0">
+          No expenses in this month.
+        </p>
+        <div class="table-responsive" *ngIf="expenses.length > 0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Category</th>
+                <th scope="col" class="d-none d-md-table-cell">Description</th>
+                <th scope="col" class="text-right">Amount</th>
+                <th scope="col" class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let expense of expenses">
+                <td class="text-nowrap">
+                  <span class="d-md-none">{{ expense.date | date: 'MMM d':'UTC' }}</span>
+                  <span class="d-none d-md-inline">{{ expense.date | date: 'mediumDate':'UTC' }}</span>
+                </td>
+                <td>{{ expense.category?.name || 'Uncategorized' }}</td>
+                <td class="d-none d-md-table-cell">{{ expense.description }}</td>
+                <td class="text-right text-nowrap">{{ expense.amount | number: '1.2-2' }}</td>
+                <td class="text-right text-nowrap">
+                  <ng-container *ngIf="confirmingDeleteId !== expense._id; else confirmDelete">
+                    <button type="button" class="btn btn-sm btn-default" aria-label="Edit" (click)="startEdit(expense)">
+                      <i class="fas fa-pen d-md-none" aria-hidden="true"></i>
+                      <span class="d-none d-md-inline">Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger ml-1"
+                      aria-label="Delete"
+                      (click)="confirmingDeleteId = expense._id"
+                    >
+                      <i class="fas fa-trash d-md-none" aria-hidden="true"></i>
+                      <span class="d-none d-md-inline">Delete</span>
+                    </button>
+                  </ng-container>
+                  <ng-template #confirmDelete>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="remove(expense)"
+                      [disabled]="deletingId === expense._id"
+                      aria-label="Confirm delete"
+                    >
+                      <i class="fas fa-check d-md-none" aria-hidden="true"></i>
+                      <span class="d-none d-md-inline">Confirm delete</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-default ml-1"
+                      aria-label="Keep"
+                      (click)="confirmingDeleteId = null"
+                    >
+                      <i class="fas fa-times d-md-none" aria-hidden="true"></i>
+                      <span class="d-none d-md-inline">Keep</span>
+                    </button>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="2">Total</th>
+                <th class="d-none d-md-table-cell"></th>
+                <th class="text-right text-nowrap">{{ total | number: '1.2-2' }}</th>
+                <th></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

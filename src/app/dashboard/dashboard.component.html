@@ -1,0 +1,105 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2 align-items-center">
+      <div class="col-sm-8">
+        <h1 class="m-0">Dashboard</h1>
+      </div>
+      <div class="col-sm-4 mt-2 mt-sm-0">
+        <app-month-picker></app-month-picker>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="alert alert-danger" role="alert" *ngIf="error">{{ error }}</div>
+
+    <div class="callout callout-info" *ngIf="stats && income === 0">
+      <h5>Set your monthly income</h5>
+      <p class="mb-0">
+        Remaining income is worked out from it.
+        <a routerLink="/profile">Set it on your profile.</a>
+      </p>
+    </div>
+
+    <p class="text-muted" *ngIf="loading && !stats">Loading…</p>
+
+    <ng-container *ngIf="stats">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="info-box">
+            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-coins"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Monthly income</span>
+              <span class="info-box-number">{{ income | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="info-box">
+            <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-receipt"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Spent</span>
+              <span class="info-box-number">{{ stats.totalExpenses | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="info-box">
+            <span
+              class="info-box-icon elevation-1"
+              [ngClass]="stats.remainingIncome < 0 ? 'bg-warning' : 'bg-success'"
+            >
+              <i class="fas fa-piggy-bank"></i>
+            </span>
+            <div class="info-box-content">
+              <span class="info-box-text">Remaining</span>
+              <span class="info-box-number">{{ stats.remainingIncome | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="info-box">
+            <span class="info-box-icon bg-secondary elevation-1"><i class="fas fa-calendar-day"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Average per day</span>
+              <span class="info-box-number">{{ stats.averageDailyExpense | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Spending by category</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-0" *ngIf="breakdown.length === 0">
+            No expenses this month. <a routerLink="/expenses">Add one.</a>
+          </p>
+          <div class="mb-3" *ngFor="let row of breakdown; let last = last" [class.mb-0]="last">
+            <div class="d-flex justify-content-between">
+              <span>{{ row.name }}</span>
+              <span>
+                {{ row.amount | number: '1.2-2' }}
+                <small class="text-muted">({{ row.share | number: '1.0-0' }}%)</small>
+              </span>
+            </div>
+            <div class="progress progress-sm">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                [style.width.%]="row.share"
+                [attr.aria-valuenow]="row.share | number: '1.0-0'"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-label]="row.name"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</section>

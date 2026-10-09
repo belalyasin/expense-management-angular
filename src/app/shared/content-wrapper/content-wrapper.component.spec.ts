@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ContentWrapperComponent } from './content-wrapper.component';
 
@@ -8,6 +11,7 @@ describe('ContentWrapperComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, RouterTestingModule, ReactiveFormsModule],
       declarations: [ ContentWrapperComponent ]
     })
     .compileComponents();

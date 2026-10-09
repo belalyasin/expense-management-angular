@@ -1,0 +1,114 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2 align-items-center">
+      <div class="col-sm-9">
+        <h1 class="m-0">Categories</h1>
+      </div>
+      <div class="col-sm-3 mt-2 mt-sm-0 text-sm-right">
+        <button type="button" class="btn btn-primary btn-block" (click)="startAdd()" *ngIf="!formOpen">
+          <i class="fas fa-plus mr-1"></i>Add category
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="alert alert-danger" role="alert" *ngIf="error">{{ error }}</div>
+
+    <div class="card card-primary" *ngIf="formOpen">
+      <div class="card-header">
+        <h3 class="card-title">{{ editing ? 'Edit category' : 'New category' }}</h3>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="card-body">
+          <div class="alert alert-danger" role="alert" *ngIf="formError">{{ formError }}</div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="category-name">Name</label>
+              <input
+                id="category-name"
+                type="text"
+                class="form-control"
+                formControlName="name"
+                [class.is-invalid]="showError('name')"
+              />
+              <span class="invalid-feedback">Enter a name.</span>
+            </div>
+            <div class="form-group col-md-8">
+              <label for="category-description">Description</label>
+              <input
+                id="category-description"
+                type="text"
+                class="form-control"
+                formControlName="description"
+                [class.is-invalid]="showError('description')"
+              />
+              <span class="invalid-feedback">Enter a short description.</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save' }}
+          </button>
+          <button type="button" class="btn btn-default ml-2" (click)="closeForm()" [disabled]="saving">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <p class="text-muted p-3 mb-0" *ngIf="loading">Loading…</p>
+        <p class="text-muted p-3 mb-0" *ngIf="!loading && !error && categories.length === 0">
+          No categories yet. Add one to start recording expenses.
+        </p>
+        <div class="table-responsive" *ngIf="categories.length > 0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let category of categories">
+                <td>{{ category.name }}</td>
+                <td>{{ category.description }}</td>
+                <td class="text-right text-nowrap">
+                  <ng-container *ngIf="confirmingDeleteId !== category._id; else confirmDelete">
+                    <button type="button" class="btn btn-sm btn-default" (click)="startEdit(category)">Edit</button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger ml-1"
+                      (click)="confirmingDeleteId = category._id"
+                    >
+                      Delete
+                    </button>
+                  </ng-container>
+                  <ng-template #confirmDelete>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="remove(category)"
+                      [disabled]="deletingId === category._id"
+                    >
+                      Confirm delete
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default ml-1" (click)="confirmingDeleteId = null">
+                      Keep
+                    </button>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

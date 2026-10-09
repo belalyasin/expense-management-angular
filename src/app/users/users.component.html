@@ -1,1 +1,63 @@
-<p>users works!</p>
+<div class="content-header">
+  <div class="container-fluid">
+    <h1 class="m-0">Profile</h1>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Account</h3>
+          </div>
+          <div class="card-body">
+            <p class="text-muted mb-0" *ngIf="!user">Loading…</p>
+            <dl class="row mb-0" *ngIf="user">
+              <dt class="col-sm-4">Name</dt>
+              <dd class="col-sm-8">{{ user.firstname }} {{ user.lastname }}</dd>
+              <dt class="col-sm-4">Username</dt>
+              <dd class="col-sm-8">{{ user.username }}</dd>
+              <dt class="col-sm-4">Email</dt>
+              <dd class="col-sm-8 mb-0">{{ user.email }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Monthly income</h3>
+          </div>
+          <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+            <div class="card-body">
+              <div class="alert alert-success" role="status" *ngIf="saved">Monthly income saved.</div>
+              <div class="alert alert-danger" role="alert" *ngIf="error">{{ error }}</div>
+              <div class="form-group mb-0">
+                <label for="monthly-income">Amount</label>
+                <input
+                  id="monthly-income"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputmode="decimal"
+                  class="form-control"
+                  formControlName="monthlyIncome"
+                  [class.is-invalid]="form.controls.monthlyIncome.invalid && form.controls.monthlyIncome.touched"
+                />
+                <span class="invalid-feedback">Enter zero or a positive amount.</span>
+                <small class="form-text text-muted">The dashboard subtracts each month's spending from it.</small>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary" [disabled]="saving || !user">
+                {{ saving ? 'Saving…' : 'Save' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
